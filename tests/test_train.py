@@ -10,7 +10,7 @@ from lemmy.lemmatizer import _find_suffix_start
 
 @pytest.fixture(scope="module")
 def lemmatizer(request):
-    return lemmy.load()
+    return lemmy.load("da")
 
 
 def _prepare(data):

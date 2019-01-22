@@ -40,7 +40,7 @@ Usage
     nlp = da.load()
 
     # create an instance of Lemmy's pipeline component for spaCy
-    pipe = lemmy.pipe.load()
+    pipe = lemmy.pipe.load('da')
 
     # add the comonent to the spaCy pipeline.
     nlp.add_pipe(pipe, after='tagger')

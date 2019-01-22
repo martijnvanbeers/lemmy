@@ -116,8 +116,13 @@ class Lemmatizer(object):  # pylint: disable=too-few-public-methods
         logging.debug("rules after pruning: %s (%s removed)", post_prune_count, pre_prune_count - post_prune_count)
 
 
-def load():
-    from lemmy.rules import rules as default_rules
+def load(lang="da"):
+    if lang == "da":
+        from lemmy.lang.da.rules import rules as default_rules
+    elif lang == "nl":
+        from lemmy.lang.nl.rules import rules as default_rules
+    else:
+        raise ValueError("Sorry, language '{}' is not (yet) supported".format(lang))
     return Lemmatizer(default_rules)
 
 

@@ -1,9 +1,9 @@
 # coding: utf8
 """A spaCy pipeline component."""
-from lemmy import Lemmatizer
-from lemmy.rules import rules as default_rules
 from spacy.tokens import Token
 from spacy.symbols import PRON_LEMMA
+from lemmy import Lemmatizer
+from lemmy import load as load_lang
 
 
 class LemmyPipelineComponent(object):
@@ -15,13 +15,9 @@ class LemmyPipelineComponent(object):
 
     name = 'lemmy'
 
-    def __init__(self, rules):
+    def __init__(self, lemmatizer_obj):
         """Initialize a pipeline component instance."""
-        self._internal = Lemmatizer(rules)
-        self._lemma = 'lemma'
-
-        # Add attributes
-        Token.set_extension(self._lemma, default=None)
+        self._internal = lemmatizer_obj
 
     def __call__(self, doc):
         """
@@ -31,22 +27,26 @@ class LemmyPipelineComponent(object):
         RETURNS (Doc): The modified `Doc` object.
         """
         for token in doc:
-            if token.lemma_ == PRON_LEMMA:
+            if token.pos_ == "PRON":
                 lemma = PRON_LEMMA
             else:
                 lemma = self._get_lemma(token)
 
             if not lemma:
                 continue
-            token._.set(self._lemma, lemma)
+            token.lemma_ = lemma
         return doc
 
     def _get_lemma(self, token):
         lemmas = self._internal.lemmatize(token.pos_, token.text)
         if len(lemmas) != 1:
-            return None
+            for l in lemmas:
+                if token.orth_ == l:
+                    continue
+                return l
         return lemmas[0]
 
 
-def load():
-    return LemmyPipelineComponent(default_rules)
+def load(lang="da"):
+    lemmatizer = load_lang(lang)
+    return LemmyPipelineComponent(lemmatizer)
